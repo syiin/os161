@@ -205,7 +205,9 @@ lock_acquire(struct lock *lock)
 
 void
 lock_release(struct lock *lock)
-{	
+{
+	KASSERT(lock_do_i_hold(lock));
+
 	spinlock_acquire(&lock->lk_splock);
 	lock->lk_owner = NULL;
 	wchan_wakeone(lock->lk_wchan, &lock->lk_splock);
