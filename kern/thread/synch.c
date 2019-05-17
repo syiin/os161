@@ -174,7 +174,7 @@ lock_destroy(struct lock *lock)
 	KASSERT(lock != NULL);
 
 	// add stuff here as needed
-
+	KASSERT(lock->lk_owner == NULL);
 	kfree(lock->lk_name);
 	kfree(lock);
 }
