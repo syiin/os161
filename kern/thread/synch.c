@@ -245,8 +245,8 @@ cv_create(const char *name)
 	}
 
 	// add stuff here as needed
-	
 	cv->cv_wchan = wchan_create(cv->cv_name);
+	cv->cv_lock = lock_create(cv->cv_name);
 
 	return cv;
 }
@@ -259,6 +259,8 @@ cv_destroy(struct cv *cv)
 	// add stuff here as needed
 
 	kfree(cv->cv_name);
+	lock_destroy(cv->cv_lock);
+	wchan_destroy(cv->cv_wchan);
 	kfree(cv);
 }
 
