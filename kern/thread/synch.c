@@ -265,8 +265,6 @@ cv_destroy(struct cv *cv)
 void
 cv_wait(struct cv *cv, struct lock *lock)
 {
-//	(void)cv;    // suppress warning until code gets written
-//	(void)lock;  // suppress warning until code gets written
 	KASSERT(!curthread->t_in_interrupt);
 
 	spinlock_acquire(&cv->cv_splock);
@@ -280,8 +278,6 @@ cv_wait(struct cv *cv, struct lock *lock)
 void
 cv_signal(struct cv *cv, struct lock *lock)
 {
-//	(void)cv;    // suppress warning until code gets written
-//	(void)lock;  // suppress warning until code gets written
 	KASSERT(lock_do_i_hold(lock));
 
 	spinlock_acquire(&cv->cv_splock);	
@@ -292,8 +288,6 @@ cv_signal(struct cv *cv, struct lock *lock)
 void
 cv_broadcast(struct cv *cv, struct lock *lock)
 {
-//	(void)cv;    // suppress warning until code gets written
-//	(void)lock;  // suppress warning until code gets written
 	KASSERT(lock_do_i_hold(lock));
 
 	spinlock_acquire(&cv->cv_splock);
