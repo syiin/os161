@@ -16,11 +16,28 @@
  * Use these stubs to test your reader-writer locks.
  */
 
+#define CREATELOOPS 8
+#define NTHREADS 32
+#define RWLOOPS 3
+
 int rwtest(int nargs, char **args) {
 	(void)nargs;
 	(void)args;
 
-	kprintf_n("rwt1 unimplemented\n");
+	int i, result;
+
+	kprintf_n("Starting rwt2...\n");
+	for (i = 0; i < CREATELOOPS; i++)
+	{
+		kprintf_t(".");
+		test_rw = rwlock_create("test_rwlock");
+		if(test_rw == NULL)
+		{
+			panic("rwtest: rwlock_create failed\n");
+		}
+
+	}
+ 
 	success(TEST161_FAIL, SECRET, "rwt1");
 
 	return 0;
