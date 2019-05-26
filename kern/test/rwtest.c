@@ -20,23 +20,50 @@
 #define NTHREADS 32
 #define RWLOOPS 3
 
-int rwtest(int nargs, char **args) {
+//static struct rwlock *testrwlock = NULL;
+
+//static 
+//void
+//rwtestthread(void *junk, unsigned long num)
+//{
+//	int i;
+//
+//	for (i=0; i<RWLOOPS; i++)
+//	{
+//		rwlock_acquire_read(testrwlock);
+//	}
+//}
+
+int 
+rwtest(int nargs, char **args) 
+{
 	(void)nargs;
 	(void)args;
 
-	int i, result;
+	int i;
+	struct rwlock * test_rw; 
 
 	kprintf_n("Starting rwt2...\n");
 	for (i = 0; i < CREATELOOPS; i++)
 	{
 		kprintf_t(".");
+		//create rwlock
 		test_rw = rwlock_create("test_rwlock");
 		if(test_rw == NULL)
 		{
 			panic("rwtest: rwlock_create failed\n");
 		}
-
+		else
+		{
+			kprintf_n("rw locks successfully created\n");
+		}
 	}
+
+//	for (i = 0; i < CREATELOOPS; i++)
+//	{
+//		kprintf_t(".");
+//		result = thread_fork("rwtest", NULL, );
+//	}
  
 	success(TEST161_FAIL, SECRET, "rwt1");
 
