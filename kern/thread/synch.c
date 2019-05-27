@@ -316,17 +316,26 @@ rwlock * rwlock_create(const char * name)
 }
 
 void
-rwlock_acquire_read(struct rwlock *rwlock) {
+rwlock_destroy(struct rwlock *rwlock)
+{
 	(void) rwlock;
 }
 
 void
-rwlock_release_read(struct rwlock *rwlock) {
+rwlock_acquire_read(struct rwlock *rwlock) 
+{
+	(void) rwlock;
+}
+
+void
+rwlock_release_read(struct rwlock *rwlock) 
+{
 	(void) rwlock;
 }
 
 void 
-rwlock_acquire_write(struct rwlock *rwlock){
+rwlock_acquire_write(struct rwlock *rwlock)
+{
 	(void) rwlock;	
 }
 

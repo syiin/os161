@@ -17,7 +17,7 @@
  */
 
 #define CREATELOOPS 8
-#define NTHREADS 8
+#define NTHREADS 3
 #define RWLOOPS 3
 
 static struct rwlock *test_rw = NULL;
@@ -30,8 +30,7 @@ rwlocktestthread(void *junk, unsigned long num)
 	(void)num;
 
 	rwlock_acquire_read(test_rw);
-	kprintf_n("...acquired lock\n");
-	rwlock_
+	rwlock_release_read(test_rw);
 	return;
 }
 
@@ -41,7 +40,7 @@ rwtest(int nargs, char **args)
 	(void)nargs;
 	(void)args;
 
-	int i;
+	int i, result;
 
 	kprintf_n("Starting rwt1...\n");
 	kprintf_t(".");
@@ -50,7 +49,7 @@ rwtest(int nargs, char **args)
 	test_rw = rwlock_create("test_rwlock");
 	if(test_rw == NULL)
 	{
-		panic("rwtest: rwlock_create failed\n");
+		panic("rwtest1: rwlock_create failed\n");
 	}
 	else
 	{
@@ -59,10 +58,22 @@ rwtest(int nargs, char **args)
 	
 	for (i=0; i < NTHREADS; i++)
 	{
-		thread_fork("synchtest", NULL, rwlocktestthread, NULL, i);
+		kprintf_t(".");
+		result = thread_fork("synchtest", NULL, rwlocktestthread, NULL, i);
+		if (result) {
+			panic("rwtest1: thread_fork failed: %s\n",
+				strerror(result));
+		}
 	}
 
- 
+	for (i=0; i<NTHREADS; i++) {
+		rwlock_release_read(test_rw);
+	}
+
+	rwlock_destroy(test_rw);
+	test_rw = NULL;
+
+	kprintf_t("\n");
 	success(TEST161_SUCCESS, SECRET, "rwt1");
 
 	return 0;
