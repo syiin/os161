@@ -45,7 +45,7 @@ rwtest(int nargs, char **args)
 	kprintf_n("Starting rwt1...\n");
 	kprintf_t(".");
 	
-	//create rwlock
+	//Test rwlock_create()
 	test_rw = rwlock_create("test_rwlock");
 	if(test_rw == NULL)
 	{
@@ -56,6 +56,7 @@ rwtest(int nargs, char **args)
 		kprintf_n("rw locks successfully created\n");
 	}
 	
+	//Test rwlock_acquire_read() & rwlock_release_read()
 	for (i=0; i < NTHREADS; i++)
 	{
 		kprintf_t(".");
@@ -69,6 +70,10 @@ rwtest(int nargs, char **args)
 	for (i=0; i<NTHREADS; i++) {
 		rwlock_release_read(test_rw);
 	}
+	
+	//Test rwlock_acquire_write() & rwlock_release_write()
+	rwlock_acquire_write(test_rw);
+	rwlock_release_write(test_rw);
 
 	rwlock_destroy(test_rw);
 	test_rw = NULL;

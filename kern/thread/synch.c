@@ -318,7 +318,10 @@ rwlock * rwlock_create(const char * name)
 void
 rwlock_destroy(struct rwlock *rwlock)
 {
-	(void) rwlock;
+	KASSERT(rwlock != NULL);
+
+	kfree(rwlock->rwlock_name);
+	kfree(rwlock);
 }
 
 void
@@ -328,7 +331,7 @@ rwlock_acquire_read(struct rwlock *rwlock)
 }
 
 void
-rwlock_release_read(struct rwlock *rwlock) 
+rwlock_release_read(struct rwlock *rwlock)
 {
 	(void) rwlock;
 }

@@ -156,6 +156,7 @@ void cv_broadcast(struct cv *cv, struct lock *lock);
 struct rwlock {
         char *rwlock_name;
         // add what you need here
+	struct cv *rwlock_cv;
 };
 
 struct rwlock * rwlock_create(const char *);
