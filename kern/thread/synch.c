@@ -301,8 +301,8 @@ rwlock * rwlock_create(const char * name)
 {
 	struct rwlock *new_rwlock;
 
-	new_rwlock = kmalloc(sizeof(*rwlock));
-	if (rwlock  == NULL) {
+	new_rwlock = kmalloc(sizeof(*new_rwlock));
+	if (new_rwlock  == NULL) {
 		return NULL;
 	}
 
@@ -314,3 +314,25 @@ rwlock * rwlock_create(const char * name)
 
 	return new_rwlock;
 }
+
+void
+rwlock_acquire_read(struct rwlock *rwlock) {
+	(void) rwlock;
+}
+
+void
+rwlock_release_read(struct rwlock *rwlock) {
+	(void) rwlock;
+}
+
+void 
+rwlock_acquire_write(struct rwlock *rwlock){
+	(void) rwlock;	
+}
+
+void 
+rwlock_release_write(struct rwlock *rwlock){
+	(void) rwlock;
+}
+
+
