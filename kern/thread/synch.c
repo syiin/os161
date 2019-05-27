@@ -294,3 +294,23 @@ cv_broadcast(struct cv *cv, struct lock *lock)
 	wchan_wakeall(cv->cv_wchan, &cv->cv_splock);
 	spinlock_release(&cv->cv_splock);
 }
+
+// My Reader Writer Locks
+struct
+rwlock * rwlock_create(const char * name)
+{
+	struct rwlock *new_rwlock;
+
+	new_rwlock = kmalloc(sizeof(*rwlock));
+	if (rwlock  == NULL) {
+		return NULL;
+	}
+
+	new_rwlock->rwlock_name = kstrdup(name);
+	if (new_rwlock->rwlock_name == NULL) {
+		kfree(new_rwlock);
+		return NULL;
+	}
+
+	return new_rwlock;
+}
