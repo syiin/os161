@@ -30,7 +30,6 @@ rwlocktestthread(void *junk, unsigned long num)
 	(void)num;
 
 	rwlock_acquire_read(test_rw);
-	rwlock_release_read(test_rw);
 	return;
 }
 
@@ -55,8 +54,12 @@ rwtest(int nargs, char **args)
 	{
 		kprintf_n("rw locks successfully created\n");
 	}
+
+  //single read acquire and release
+  rw_lock_acquire(test_rw);
+  rw_lock_release(test_rw)
 	
-	//Test rwlock_acquire_read() & rwlock_release_read()
+  //multiple read acquires
 	for (i=0; i < NTHREADS; i++)
 	{
 		kprintf_t(".");
@@ -68,11 +71,9 @@ rwtest(int nargs, char **args)
 	}
 
   //release without holding
-	for (i=0; i<NTHREADS; i++) {
-		rwlock_release_read(test_rw);
-	}
+  rwlock_release_write(test_rw);
 	
-	//Test rwlock_acquire_write() & rwlock_release_write()
+  //single acquire write
 	rwlock_acquire_write(test_rw);
 	rwlock_release_write(test_rw);
 
