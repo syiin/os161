@@ -67,6 +67,7 @@ rwtest(int nargs, char **args)
 		}
 	}
 
+  //release without holding
 	for (i=0; i<NTHREADS; i++) {
 		rwlock_release_read(test_rw);
 	}
