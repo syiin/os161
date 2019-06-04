@@ -324,6 +324,9 @@ rwlock * rwlock_create(const char * name)
     return NULL;
   }
 
+  spinlock_init(&new_rwlock->reader_splock);
+  spinlock_init(&new_rwlock->writer_splock);
+
   new_rwlock->readers_in = 0;
 
 	return new_rwlock;
@@ -333,6 +336,8 @@ void
 rwlock_destroy(struct rwlock *rwlock)
 {
 	KASSERT(rwlock != NULL);
+  wchan_destroy(rwlock->reader_wchan);
+  wchan_destroy(rwlock->writer_wchan);
 
 	kfree(rwlock->rwlock_name);
 	kfree(rwlock);
@@ -342,6 +347,7 @@ void
 rwlock_acquire_read(struct rwlock *rwlock) 
 {
 	(void) rwlock;
+
 }
 
 void
