@@ -347,13 +347,18 @@ void
 rwlock_acquire_read(struct rwlock *rwlock) 
 {
 	(void) rwlock;
-
 }
 
 void
 rwlock_release_read(struct rwlock *rwlock)
 {
-	(void) rwlock;
+  spinlock_acquire(&rwlock->writer_splock);
+  wchan_wakeone(rwlock->writer_wchan, &rwlock->writer_splock);
+  spinlock_release(&rwlock->writer_splock);
+
+  spinlock_acquire(&rwlock->reader_splock);
+  wchan_sleep(rwlock->writer_wchan, &rwlock->reader_splock);
+  spinlock_release(&rwlock->reader_splock);
 }
 
 void 
@@ -364,7 +369,12 @@ rwlock_acquire_write(struct rwlock *rwlock)
 
 void 
 rwlock_release_write(struct rwlock *rwlock){
-	(void) rwlock;
-}
+  spinlock_acquire(&rwlock->reader_splock);
+  wchan_wakeall(rwlock->reader_wchan, &rwlock->reader_splock);
+  spinlock_release(&rwlock->reader_splock);
 
+  spinlock_acquire(&rwlock->writer_splock);
+  wchan_sleep(rwlock->writer_wchan, &rwlock->writer_splock);
+  spinlock_release(&rwlock->writer_splock);
+}
 
