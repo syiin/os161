@@ -90,7 +90,7 @@ writetestthread(void *junk, unsigned long num){
     testval3 = num%3;
 
     random_yielder(4);
-    failif(rwtest->readers_in != 0);
+    failif(test_rw->readers_in != 0);
 
     testval1 = num*num;
     random_yielder(4);
@@ -105,7 +105,7 @@ writetestthread(void *junk, unsigned long num){
     failif(testval1 != num);
 
     random_yielder(4);
-    failif(rwtest->readers_in != 0);
+    failif(test_rw->readers_in != 0);
   }
 	rwlock_release_write(test_rw);
   kprintf_t("writer out: %u\n", num);
@@ -119,50 +119,6 @@ rwtest(int nargs, char **args)
 	(void)args;
 
 	int i, result;
-<<<<<<< HEAD
-
-	kprintf_n("Starting rwt1...\n");
-	kprintf_t(".");
-	
-	//Test rwlock_create()
-	test_rw = rwlock_create("test_rwlock");
-	if(test_rw == NULL)
-	{
-		panic("rwtest1: rwlock_create failed\n");
-	}
-	else
-	{
-		kprintf_n("rw locks successfully created\n");
-	}
-
-  //single read acquire and release
-  rw_lock_acquire(test_rw);
-  rw_lock_release(test_rw)
-	
-  //multiple read acquires
-	for (i=0; i < NTHREADS; i++)
-	{
-		kprintf_t(".");
-		result = thread_fork("synchtest", NULL, rwlocktestthread, NULL, i);
-		if (result) {
-			panic("rwtest1: thread_fork failed: %s\n",
-				strerror(result));
-		}
-	}
-
-  //release without holding
-  rwlock_release_write(test_rw);
-	
-  //single acquire write
-	rwlock_acquire_write(test_rw);
-	rwlock_release_write(test_rw);
-
-	rwlock_destroy(test_rw);
-	test_rw = NULL;
-
-	kprintf_t("\n");
-	success(TEST161_SUCCESS, SECRET, "rwt1");
-=======
   unsigned long num = 9;
 
   testval1 = num;
@@ -172,8 +128,8 @@ rwtest(int nargs, char **args)
   kprintf_n("Starting rwt1...\n");
   for (i=0; i<CREATELOOPS; i++){
     kprintf_t(".");
-    rwtest = rwlock_create("rwtest"); //try to create reader-writer lock
-    if (rwtest==NULL){
+    test_rw = rwlock_create("test_rw"); //try to create reader-writer lock
+    if (test_rw==NULL){
       panic("rwt1: rwlock_create failed\n");
     }
 
@@ -183,7 +139,7 @@ rwtest(int nargs, char **args)
     }
 
     if (i != CREATELOOPS-1){ //clean up we error out early
-      rwlock_destroy(rwtest);
+      rwlock_destroy(test_rw);
       sem_destroy(donesem);
     }
   }
@@ -212,14 +168,13 @@ rwtest(int nargs, char **args)
     P(donesem);
   }
 
-  rwlock_destroy(rwtest);
-  rwtest= NULL;
+  rwlock_destroy(test_rw);
+  test_rw= NULL;
   sem_destroy(donesem);
   donesem=NULL;
 
   kprintf_t("\n");
   success(test_status, SECRET, "rwt1");
->>>>>>> d81e70aa88e43de23ab8a6d6a29289b13898bcef
 
 	return 0;
 }

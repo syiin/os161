@@ -312,6 +312,8 @@ rwlock * rwlock_create(const char * name)
 		return NULL;
 	}
 
+  new_rwlock->readers_in = 0;
+
 	return new_rwlock;
 }
 
