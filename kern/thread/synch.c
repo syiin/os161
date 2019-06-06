@@ -324,8 +324,7 @@ rwlock * rwlock_create(const char * name)
     return NULL;
   }
 
-  spinlock_init(&new_rwlock->reader_splock);
-  spinlock_init(&new_rwlock->writer_splock);
+  spinlock_init(&new_rwlock->rwlock_splock);
 
   new_rwlock->readers_in = 0;
 
@@ -352,13 +351,11 @@ rwlock_acquire_read(struct rwlock *rwlock)
 void
 rwlock_release_read(struct rwlock *rwlock)
 {
-  spinlock_acquire(&rwlock->writer_splock);
-  wchan_wakeone(rwlock->writer_wchan, &rwlock->writer_splock);
-  spinlock_release(&rwlock->writer_splock);
+  spinlock_acquire(&rwlock->rwlock_splock);
+  wchan_wakeone(rwlock->writer_wchan, &rwlock->rwlock_splock);
 
-  spinlock_acquire(&rwlock->reader_splock);
-  wchan_sleep(rwlock->writer_wchan, &rwlock->reader_splock);
-  spinlock_release(&rwlock->reader_splock);
+  wchan_sleep(rwlock->writer_wchan, &rwlock->rwlock_splock);
+  spinlock_release(&rwlock->rwlock_splock);
 }
 
 void 
@@ -369,12 +366,12 @@ rwlock_acquire_write(struct rwlock *rwlock)
 
 void 
 rwlock_release_write(struct rwlock *rwlock){
-  spinlock_acquire(&rwlock->reader_splock);
-  wchan_wakeall(rwlock->reader_wchan, &rwlock->reader_splock);
-  spinlock_release(&rwlock->reader_splock);
+  spinlock_acquire(&rwlock->rwlock_splock);
+  wchan_wakeall(rwlock->reader_wchan, &rwlock->rwlock_splock);
+  spinlock_release(&rwlock->rwlock_splock);
 
-  spinlock_acquire(&rwlock->writer_splock);
-  wchan_sleep(rwlock->writer_wchan, &rwlock->writer_splock);
-  spinlock_release(&rwlock->writer_splock);
+  spinlock_acquire(&rwlock->rwlock_splock);
+  wchan_sleep(rwlock->writer_wchan, &rwlock->rwlock_splock);
+  spinlock_release(&rwlock->rwlock_splock);
 }
 

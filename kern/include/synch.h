@@ -157,10 +157,12 @@ struct rwlock {
         char *rwlock_name;
         // add what you need here
         struct cv *rwlock_cv;
-        volatile int readers_in;
+        volatile unsigned readers_in;
+        volatile unsigned readers_count;
+        volatile bool writers_turn;
+        volatile bool writers_in;
 
-        struct spinlock reader_splock;
-        struct spinlock writer_splock;
+        struct spinlock rwlock_splock;
         struct wchan *reader_wchan;
         struct wchan *writer_wchan;
 };
