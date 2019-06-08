@@ -40,6 +40,8 @@
 #include <current.h>
 #include <synch.h>
 
+
+
 ////////////////////////////////////////////////////////////
 //
 // Semaphore.
@@ -345,33 +347,73 @@ rwlock_destroy(struct rwlock *rwlock)
 void
 rwlock_acquire_read(struct rwlock *rwlock) 
 {
-	(void) rwlock;
+  spinlock_acquire(&rwlock->rwlock_splock);
+  
+  //if the writer is in OR reader_wchan is NOT empty OR it's the writers turn AND the writer wait channel is NOT empty
+  if (rwlock->writer_in ||
+      (!wchan_isempty(rwlock->reader_wchan, &rwlock->rwlock_splock)) ||
+      (rwlock->writer_turn && !(wchan_isempty(rwlock->writer_wchan, &rwlock->rwlock_splock))))
+    wchan_sleep(rwlock->reader_wchan, &rwlock->rwlock_splock);
+
+  rwlock->readers_in++;
+  rwlock->readers_count++;
+  if ((rwlock->readers_count % MAX_COUNT_RWLOCK) == 0)
+    rwlock->writer_turn = true;
+
+  spinlock_release(&rwlock->rwlock_splock);
 }
 
 void
 rwlock_release_read(struct rwlock *rwlock)
 {
   spinlock_acquire(&rwlock->rwlock_splock);
-  wchan_wakeone(rwlock->writer_wchan, &rwlock->rwlock_splock);
 
-  wchan_sleep(rwlock->writer_wchan, &rwlock->rwlock_splock);
+  rwlock->readers_in--;
+  //if it's NOT the writers turn AND the reader wait channel is NOT empty
+  if (!rwlock->writer_turn && 
+      !wchan_isempty(rwlock->reader_wchan, &rwlock->rwlock_splock))
+    wchan_wakeone(rwlock->reader_wchan, &rwlock->rwlock_splock);
+  //else if there are no readers in AND the writer wait channel is NOT empty
+  else if ((rwlock->readers_in == 0) &&
+      !wchan_isempty(rwlock->writer_wchan, &rwlock->rwlock_splock)){
+    wchan_wakeone(rwlock->writer_wchan, &rwlock->rwlock_splock);
+    rwlock->writer_in = true;
+  }
+
   spinlock_release(&rwlock->rwlock_splock);
 }
 
 void 
 rwlock_acquire_write(struct rwlock *rwlock)
 {
-	(void) rwlock;	
+  spinlock_acquire(&rwlock->rwlock_splock);
+
+  if (rwlock->writer_in ||
+      rwlock->readers_in != 0 ||
+      (!rwlock->writer_turn && !wchan_isempty(rwlock->writer_wchan, &rwlock->rwlock_splock)))
+    wchan_sleep(rwlock->writer_wchan, &rwlock->rwlock_splock);
+  
+  rwlock->writer_in = true;
+
+  spinlock_release(&rwlock->rwlock_splock);
 }
 
 void 
 rwlock_release_write(struct rwlock *rwlock){
   spinlock_acquire(&rwlock->rwlock_splock);
-  wchan_wakeall(rwlock->reader_wchan, &rwlock->rwlock_splock);
-  spinlock_release(&rwlock->rwlock_splock);
 
-  spinlock_acquire(&rwlock->rwlock_splock);
-  wchan_sleep(rwlock->writer_wchan, &rwlock->rwlock_splock);
+  rwlock->writer_in = false;
+  rwlock->writer_turn = false;
+  
+  //if there is a reader waiting
+  if (!wchan_isempty(rwlock->reader_wchan, &rwlock->rwlock_splock))
+    wchan_wakeone(rwlock->reader_wchan, &rwlock->rwlock_splock);
+  //if there is a writer waiting
+  else if (!wchan_isempty(rwlock->writer_wchan, &rwlock->rwlock_splock)){
+    wchan_wakeone(rwlock->writer_wchan, &rwlock->rwlock_splock);
+    rwlock->writer_in = true;
+  }
+
   spinlock_release(&rwlock->rwlock_splock);
 }
 

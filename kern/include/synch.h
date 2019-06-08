@@ -153,14 +153,16 @@ void cv_broadcast(struct cv *cv, struct lock *lock);
  * (should be) made internally.
  */
 
+#define MAX_COUNT_RWLOCK 8
+
 struct rwlock {
         char *rwlock_name;
         // add what you need here
         struct cv *rwlock_cv;
         volatile unsigned readers_in;
         volatile unsigned readers_count;
-        volatile bool writers_turn;
-        volatile bool writers_in;
+        volatile bool writer_turn;
+        volatile bool writer_in;
 
         struct spinlock rwlock_splock;
         struct wchan *reader_wchan;
