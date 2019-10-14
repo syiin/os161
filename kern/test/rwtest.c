@@ -79,7 +79,7 @@ writetestthread(void *junk, unsigned long num){
 	(void)junk;
 
   unsigned i;
-
+  kprintf_t("%d", num);
   random_yielder(4);
 
 	rwlock_acquire_write(test_rw);

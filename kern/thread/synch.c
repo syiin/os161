@@ -157,7 +157,6 @@ lock_create(const char *name)
 
 	HANGMAN_LOCKABLEINIT(&lock->lk_hangman, lock->lk_name);
 
-	// add stuff here as needed
 	lock->lk_wchan = wchan_create(lock->lk_name);
 	if (lock->lk_wchan == NULL) {
 		kfree(lock->lk_name);
@@ -199,6 +198,7 @@ lock_acquire(struct lock *lock)
 	KASSERT(lock->lk_owner == NULL);
 	
 	lock->lk_owner = curthread;
+	//because we reacquire the spinlock here when the thread wakes up
 	spinlock_release(&lock->lk_splock);
 
 	/* Call this (atomically) once the lock is acquired */
@@ -246,7 +246,6 @@ cv_create(const char *name)
 		return NULL;
 	}
 
-	// add stuff here as needed
 	cv->cv_wchan = wchan_create(cv->cv_name);
 	spinlock_init(&cv->cv_splock);
 
@@ -258,7 +257,6 @@ cv_destroy(struct cv *cv)
 {
 	KASSERT(cv != NULL);
 
-	// add stuff here as needed
 	kfree(cv->cv_name);
 	wchan_destroy(cv->cv_wchan);
 	kfree(cv);
