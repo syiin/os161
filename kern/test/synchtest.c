@@ -138,7 +138,16 @@ semtest(int nargs, char **args)
 	P(testsem);
 	kprintf_n("OK\n");
 	kprintf_t(".");
-
+  /*
+   * HOW DOES THIS WORK:
+   * 1. testsem's count at the beginning is 0 (ie. 2 - 1 - 1)
+   * 2. then multiple threads are forked that immediately yield 
+   * 3. this thread then decrements one test sem (so, count = 1)
+   * 4. a concurrent thread immediately decrements count (count = 0)
+   * 5. only when this thread is finished (ie. V(donesem) is called) can
+   *    this thread proceed to P(donesem) and therefore, release another
+   *    testsem because donesem is effectively a lock (it's init_count = 0)
+   * */
 	for (i=0; i<NTHREADS; i++) {
 		kprintf_t(".");
 		result = thread_fork("semtest", NULL, semtestthread, NULL, i);
